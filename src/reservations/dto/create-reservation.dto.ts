@@ -1,5 +1,6 @@
 import { IsDateString, IsNotEmpty } from "class-validator";
 import { User } from "src/auth/user.entity";
+import { Room } from "src/rooms/room.entity";
 
 export class CreateReservationDto {
     @IsNotEmpty()
@@ -15,7 +16,7 @@ export class CreateReservationDto {
     endDate: Date;
 
     @IsNotEmpty()
-    roomId: string;
+    room: Room;
 
     @IsNotEmpty()
     organizer: User;

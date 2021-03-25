@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from "typeorm";
+import { Brackets, EntityRepository, Repository } from "typeorm";
 import { Room } from "./room.entity";
 import { GetRoomsFilterDto } from './dto/get-rooms-filter.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -10,8 +10,28 @@ export class RoomsRepository extends Repository<Room> {
         filterDto: GetRoomsFilterDto,
     ): Promise<Room[]> {
         const { search, startDate, endDate } = filterDto;
-
+        console.log(startDate, endDate)
         const query = this.createQueryBuilder('room');
+
+        if(startDate && endDate) {
+            // query.andWhere(new Brackets(qb => {
+            //     qb.innerJoin("room.reservations", "reservations")
+            // })
+            // query.andWhere('room.reservations is null')
+            query.leftJoin("room.reservations", "reservations")
+            query.andWhere('reservations.id is null')
+            query.orWhere("reservations.startDate != :start", {start:  new Date(startDate).toISOString()})
+            // query.andWhere("reservations.startDate < :start", {start:  new Date(startDate).toISOString()})
+            console.log(query.getSql())
+            // query.andWhere('reservations.startDate <= :start', {start:  new Date(startDate).toISOString()})
+            // query.andWhere('reservations.startDate <= :start', {start:  new Date(startDate).toISOString()})
+            // query.andWhere('reservations.startDate > :end', {end:  new Date(endDate).toISOString()})
+            // query.andWhere('reservations.endDate > :end', { end: new Date(endDate).toISOString()})
+
+            // query.andWhere('reservations.startDate >= :start', {start:  new Date(startDate).toISOString()})
+            // query.andWhere('reservations.endDate < :end', { end: new Date(endDate).toISOString()})
+            
+        }
 
         const rooms = await query.getMany();
         return rooms;

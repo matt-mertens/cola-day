@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
@@ -15,6 +15,7 @@ export class ReservationsController {
     constructor(private reservationsService: ReservationsService) {}
 
     @Get()
+    @UseInterceptors(ClassSerializerInterceptor)
     getReservations(
         @Query(ValidationPipe) filterDto: GetReservationsFilterDto,
         @GetUser() user: User,
@@ -23,6 +24,7 @@ export class ReservationsController {
     }
 
     @Get('/:id')
+    @UseInterceptors(ClassSerializerInterceptor)
     getReservationById(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User,

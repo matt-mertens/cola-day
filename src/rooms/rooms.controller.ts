@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Injectable, Param, ParseIntPipe, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Injectable, Param, ParseIntPipe, Post, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/auth/roles.decorator';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -21,6 +21,7 @@ export class RoomsController {
     }
 
     @Get('/:id')
+    @UseInterceptors(ClassSerializerInterceptor)
     getReservationById(
         @Param('id', ParseIntPipe) id: number,
     ): Promise<Room> {

@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 @EntityRepository(User)
 export class UserRespository extends Repository<User> {
-    async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+    async signUp(authCredentialsDto: AuthCredentialsDto): Promise<User> {
         const { email, password } = authCredentialsDto;
 
         const user = new User();
@@ -16,6 +16,7 @@ export class UserRespository extends Repository<User> {
 
         try {
             await user.save();
+            return user;
         } catch (error) {
             if (error.code === '23505') {
                 throw new ConflictException('Account for email already exists')

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, Post, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
@@ -12,7 +12,7 @@ export class AuthController {
     ) {}
 
     @Post('/signup')
-    signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto): Promise<void> {
+    signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto) {
         return this.authService.signUp(authCredentialsDto);
     }
 
@@ -21,9 +21,10 @@ export class AuthController {
         return this.authService.signIn(authCredentialsDto);
     }
 
-    @Post('/user')
+    @Get('/user/me')
     @UseGuards(AuthGuard())
-    test(@GetUser() user: User) {
-        console.log(user)
+    @UseInterceptors(ClassSerializerInterceptor)
+    getAuthenticatedUser(@GetUser() user: User): User {
+        return user;
     }
 }

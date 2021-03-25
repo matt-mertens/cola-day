@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ReservationRepository } from 'src/reservations/reservation.repository';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { GetRoomsFilterDto } from './dto/get-rooms-filter.dto';
 import { Room } from './room.entity';
@@ -9,7 +10,10 @@ import { RoomsRepository } from './rooms.repository';
 export class RoomsService {
     constructor(
         @InjectRepository(RoomsRepository)
-        private roomsRepository: RoomsRepository
+        private roomsRepository: RoomsRepository,
+
+        @InjectRepository(ReservationRepository)
+        private reservationsRepository: ReservationRepository,
     ) {}
 
     async getRooms(
@@ -19,7 +23,7 @@ export class RoomsService {
     }
 
     async getRoomById(id: number): Promise<Room> {
-        const room = await this.roomsRepository.findOne(id);
+        const room = await this.roomsRepository.findOne(id, { relations: ['reservations'] });
 
         if (!room) {
             throw new NotFoundException(`Room with Id ${id} not found`);

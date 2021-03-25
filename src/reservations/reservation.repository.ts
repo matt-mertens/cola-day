@@ -1,4 +1,5 @@
 import { User } from "src/auth/user.entity";
+import { Room } from "src/rooms/room.entity";
 import { EntityRepository, Repository } from "typeorm";
 import { CreateReservationDto } from "./dto/create-reservation.dto";
 import { GetReservationsFilterDto } from "./dto/get-reservations-filter.dto";
@@ -31,15 +32,16 @@ export class ReservationRepository extends Repository<Reservation> {
     async createReservation(
         createReservationDto: CreateReservationDto,
         user: User,
+        room: Room
     ): Promise<Reservation> {
-        const { title, description, startDate, endDate, roomId } = createReservationDto;
+        const { title, description, startDate, endDate } = createReservationDto;
 
         const reservation = new Reservation();
         reservation.title = title;
         reservation.description = description;
         reservation.startDate = startDate;
         reservation.endDate = endDate;
-        reservation.roomId = roomId;
+        reservation.room = room;
         reservation.organizer = user;
         reservation.status = ReservationStatus.PENDING;
         await reservation.save();

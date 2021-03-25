@@ -1,4 +1,5 @@
 import { User } from "src/auth/user.entity";
+import { Room } from "src/rooms/room.entity";
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ReservationStatus } from "./reservation-status.enum";
 
@@ -19,10 +20,10 @@ export class Reservation extends BaseEntity {
     @Column()
     endDate: Date;
 
-    @Column()
-    roomId: string;
+    @ManyToOne(type => Room, room => room.reservations, { eager: true })
+    room: Room;
 
-    @ManyToOne(type => User, user => user.reservations, { eager: false})
+    @ManyToOne(type => User, user => user.reservations, { eager: true })
     organizer: User;
 
     @Column()

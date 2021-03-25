@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
+import { RoomsRepository } from 'src/rooms/rooms.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { GetReservationsFilterDto } from './dto/get-reservations-filter.dto';
 import { ReservationStatus } from './reservation-status.enum';
@@ -11,7 +12,10 @@ import { ReservationRepository } from './reservation.repository';
 export class ReservationsService {
     constructor(
         @InjectRepository(ReservationRepository)
-        private reservationRepository: ReservationRepository
+        private reservationRepository: ReservationRepository,
+
+        @InjectRepository(RoomsRepository)
+        private roomRepository: RoomsRepository
     ) {}
 
     async getReservations(
@@ -39,7 +43,8 @@ export class ReservationsService {
         createReservationDto: CreateReservationDto,
         user: User,
     ): Promise<Reservation> {
-        return this.reservationRepository.createReservation(createReservationDto, user);
+        const room = await this.roomRepository.findOneOrFail(createReservationDto.room)
+        return this.reservationRepository.createReservation(createReservationDto, user, room);
     }
 
     async updateReservationStatus(

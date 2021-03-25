@@ -1,6 +1,7 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { Reservation } from "src/reservations/reservation.entity";
+import { Exclude } from "class-transformer";
 
 @Entity()
 @Unique(['email'])
@@ -12,12 +13,14 @@ export class User extends BaseEntity {
     email: string;
 
     @Column()
+    @Exclude()
     password: string;
 
     @Column()
+    @Exclude()
     salt: string;
 
-    @OneToMany(type => Reservation, reservation => reservation.organizer, { eager: true})
+    @OneToMany(type => Reservation, reservation => reservation.organizer, { eager: false })
     reservations: Reservation[];
 
     async validatePassword(password: string): Promise<boolean> {

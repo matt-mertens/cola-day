@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Reservation } from "src/reservations/reservation.entity";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { RoomFeatures } from "./room-features.enum";
 
 @Entity()
@@ -21,6 +22,9 @@ export class Room extends BaseEntity {
 
     @Column()
     location: string;
+
+    @OneToMany(type => Reservation, reservation => reservation.room, { eager: false})
+    reservations: Reservation[];
 
     // @Column('text', { array: true })
     // features: RoomFeatures[];
