@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,11 +12,11 @@ import { UserRespository } from './user.repository';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'test',
+      secret: `super_secret`, //`${process.env.JWT_PRIVATE_KEY}`
       signOptions: {
         expiresIn: 3600,
         audience: 'coladay-frontend',
-        issuer: 'coladay.auth',
+        issuer: 'coladay-auth',
         algorithm: 'HS256',
       }
     }),

@@ -1,12 +1,11 @@
-import { IsDateString, IsNotEmpty } from "class-validator";
-import { User } from "src/auth/user.entity";
+import { IsDateString, IsNotEmpty, IsOptional } from "class-validator";
 import { Room } from "src/rooms/room.entity";
 
 export class CreateReservationDto {
     @IsNotEmpty()
     title: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     description: string;
 
     @IsDateString()
@@ -17,7 +16,4 @@ export class CreateReservationDto {
 
     @IsNotEmpty()
     room: Room;
-
-    @IsNotEmpty()
-    organizer: User;
 }

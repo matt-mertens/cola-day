@@ -43,7 +43,12 @@ export class ReservationsService {
         createReservationDto: CreateReservationDto,
         user: User,
     ): Promise<Reservation> {
-        const room = await this.roomRepository.findOneOrFail(createReservationDto.room)
+        const room = await this.roomRepository.findOne(createReservationDto.room)
+
+        if (!room) {
+            throw new NotFoundException(`Room not found`);
+        }
+
         return this.reservationRepository.createReservation(createReservationDto, user, room);
     }
 

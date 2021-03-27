@@ -10,12 +10,13 @@ import { Reservation } from "./reservation.entity";
 export class ReservationRepository extends Repository<Reservation> {
     async getReservations(
         filterDto: GetReservationsFilterDto,
-        user: User,
+        user?: User,
     ): Promise<Reservation[]> {
         const { status, search, startDate, endDate } = filterDto;
 
         const query = this.createQueryBuilder('reservation');
         query.where('reservation.organizerId = :userId', { userId: user.id })
+        query.leftJoinAndSelect('reservation.room', 'room')
 
         if (status) {
             query.andWhere('reservation.status = :status', { status });
@@ -23,6 +24,10 @@ export class ReservationRepository extends Repository<Reservation> {
 
         if (search) {
             query.andWhere('reservation.title LIKE :search OR reservation.description LIKE :search', { search: `%${search}%` });
+        }
+
+        if (startDate && endDate) {
+            query.andWhere('reservation.startDate = :start', { start: new Date(startDate).toISOString() })
         }
 
         const reservations = await query.getMany();
@@ -43,10 +48,8 @@ export class ReservationRepository extends Repository<Reservation> {
         reservation.endDate = endDate;
         reservation.room = room;
         reservation.organizer = user;
-        reservation.status = ReservationStatus.PENDING;
+        reservation.status = ReservationStatus.CONFIRMED;
         await reservation.save();
-        delete reservation.organizer.password;
-        delete reservation.organizer.salt;
         
         return reservation;
     }

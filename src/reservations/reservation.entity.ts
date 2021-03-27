@@ -23,6 +23,9 @@ export class Reservation extends BaseEntity {
     @ManyToOne(type => Room, room => room.reservations, { eager: true })
     room: Room;
 
+    @Column()
+    roomId: number;
+
     @ManyToOne(type => User, user => user.reservations, { eager: true })
     organizer: User;
 

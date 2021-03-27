@@ -1,54 +1,63 @@
-import { Brackets, EntityRepository, Repository } from "typeorm";
+import { EntityRepository, Repository } from "typeorm";
 import { Room } from "./room.entity";
 import { GetRoomsFilterDto } from './dto/get-rooms-filter.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { ConflictException, InternalServerErrorException } from "@nestjs/common";
+import { Reservation } from "src/reservations/reservation.entity";
 
 @EntityRepository(Room)
 export class RoomsRepository extends Repository<Room> {
     async getRooms(
         filterDto: GetRoomsFilterDto,
+        reservations?: Reservation[]
     ): Promise<Room[]> {
-        const { search, startDate, endDate } = filterDto;
-        console.log(startDate, endDate)
+        const { search, availability, startDate, endDate } = filterDto;
         const query = this.createQueryBuilder('room');
 
-        if(startDate && endDate) {
-            // query.andWhere(new Brackets(qb => {
-            //     qb.innerJoin("room.reservations", "reservations")
-            // })
-            // query.andWhere('room.reservations is null')
-            query.leftJoin("room.reservations", "reservations")
-            query.andWhere('reservations.id is null')
-            query.orWhere("reservations.startDate != :start", {start:  new Date(startDate).toISOString()})
-            // query.andWhere("reservations.startDate < :start", {start:  new Date(startDate).toISOString()})
-            console.log(query.getSql())
-            // query.andWhere('reservations.startDate <= :start', {start:  new Date(startDate).toISOString()})
-            // query.andWhere('reservations.startDate <= :start', {start:  new Date(startDate).toISOString()})
-            // query.andWhere('reservations.startDate > :end', {end:  new Date(endDate).toISOString()})
-            // query.andWhere('reservations.endDate > :end', { end: new Date(endDate).toISOString()})
+        let rooms = await query.getMany();
 
-            // query.andWhere('reservations.startDate >= :start', {start:  new Date(startDate).toISOString()})
-            // query.andWhere('reservations.endDate < :end', { end: new Date(endDate).toISOString()})
-            
+        if (availability && startDate && endDate) {
+            let start = new Date(startDate);
+            let end = new Date(endDate);
+
+            let availability = [];
+            while(start <= end){
+                
+                
+                var newDate = new Date(new Date(start).setHours(start.getHours() + 1));
+                availability.push({
+                    startDate: start,  
+                    endDate: newDate,
+                    availableRooms: 20 - reservations.filter(reservation => {
+                        reservation.startDate == start
+                    }).length
+                })
+
+                start = newDate; 
+            }
+            return availability;
         }
 
-        const rooms = await query.getMany();
+        if (startDate && endDate) {
+            const reservationRoomIds = reservations.map(reservation => reservation.roomId)
+            rooms = rooms.filter(room => !reservationRoomIds.includes(room.id))
+        }
+
         return rooms;
     }
 
     async createRoom(
         createRoomDto: CreateRoomDto,
     ): Promise<Room> {
-        const { name, description, capacity, floor, location } = createRoomDto;
+        const { name, description, owner, capacity, floor, location } = createRoomDto;
 
         const room = new Room();
         room.name = name;
         room.description = description;
+        room.owner = owner;
         room.capacity = capacity;
         room.floor = floor;
         room.location = location;
-        // room.features = features;
 
         try {
             await room.save();

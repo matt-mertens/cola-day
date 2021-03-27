@@ -11,14 +11,33 @@ export class RoomsService {
     constructor(
         @InjectRepository(RoomsRepository)
         private roomsRepository: RoomsRepository,
-
         @InjectRepository(ReservationRepository)
-        private reservationsRepository: ReservationRepository,
+        private reservationRepository: ReservationRepository,
     ) {}
 
     async getRooms(
         filterDto: GetRoomsFilterDto
     ): Promise<Room[]> {
+        const { startDate, endDate, availability} = filterDto;
+
+        if (startDate && endDate) {
+            const query = this.reservationRepository.createQueryBuilder('reservation')
+
+            // let start =  new Date(new Date(startDate).setHours(new Date(startDate).getHours() - 4));
+            // let end =  new Date(new Date(endDate).setHours(new Date(endDate).getHours() - 4));
+            
+            if (availability) {
+                query.andWhere('reservation.startDate >= :start', { start: `${startDate}Z` })
+                query.andWhere('reservation.endDate <= :end', { end: `${endDate}Z` })
+            } else {
+                query.andWhere('reservation.startDate = :start', { start: `${startDate}Z` })
+                query.andWhere('reservation.endDate = :end', { end: `${endDate}Z` })
+            }
+            
+            const reservations = await query.getMany();
+            return await this.roomsRepository.getRooms(filterDto, reservations);
+        }
+        
         return await this.roomsRepository.getRooms(filterDto);
     }
 

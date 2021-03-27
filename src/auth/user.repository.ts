@@ -18,6 +18,7 @@ export class UserRespository extends Repository<User> {
             await user.save();
             return user;
         } catch (error) {
+            console.log(error)
             if (error.code === '23505') {
                 throw new ConflictException('Account for email already exists')
             } else {

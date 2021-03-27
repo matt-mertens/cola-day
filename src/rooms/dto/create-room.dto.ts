@@ -1,6 +1,5 @@
 import { Type } from "class-transformer";
-import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { RoomFeatures } from "../room-features.enum";
+import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateRoomDto {
     @IsNotEmpty()
@@ -8,6 +7,9 @@ export class CreateRoomDto {
 
     @IsNotEmpty()
     description: string;
+
+    @IsNotEmpty()
+    owner: string;
 
     @Type(() => Number)
     @IsInt()
@@ -20,7 +22,4 @@ export class CreateRoomDto {
     @IsNotEmpty()
     @IsString()
     location: string;
-
-    @IsOptional()
-    features: RoomFeatures[] | null;
 }
