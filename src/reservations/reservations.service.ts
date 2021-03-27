@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
 import { RoomsRepository } from 'src/rooms/rooms.repository';
@@ -43,8 +43,12 @@ export class ReservationsService {
         createReservationDto: CreateReservationDto,
         user: User,
     ): Promise<Reservation> {
-        const room = await this.roomRepository.findOne(createReservationDto.room)
+        const reservation = await this.reservationRepository.getReservations({ search: null, startDate: null, endDate: null, status: null }, user)
+        if (reservation.length !== 0) {
+            throw new ForbiddenException(`Reservation already exists for user`);
+        }
 
+        const room = await this.roomRepository.findOne(createReservationDto.room)
         if (!room) {
             throw new NotFoundException(`Room not found`);
         }
