@@ -1,5 +1,5 @@
-import { User } from "src/auth/user.entity";
-import { Room } from "src/rooms/room.entity";
+import { User } from "../auth/user.entity";
+import { Room } from "../rooms/room.entity";
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ReservationStatus } from "./reservation-status.enum";
 

@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import * as bcrypt from 'bcrypt';
-import { Reservation } from "src/reservations/reservation.entity";
+import { Reservation } from "../reservations/reservation.entity";
 import { Exclude } from "class-transformer";
 
 @Entity()

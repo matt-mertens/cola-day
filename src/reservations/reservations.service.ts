@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/auth/user.entity';
-import { RoomsRepository } from 'src/rooms/rooms.repository';
+import { User } from '../auth/user.entity';
+import { RoomsRepository } from '../rooms/rooms.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { GetReservationsFilterDto } from './dto/get-reservations-filter.dto';
 import { ReservationStatus } from './reservation-status.enum';
